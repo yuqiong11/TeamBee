@@ -24,7 +24,7 @@ class Dataset:
             full_input_path = self.input_path + str(i) + '.png'
             full_mask_path = self.mask_path + str(i) + '.png'
             img = self.transform(full_input_path, full_mask_path, mask=False)
-            mask = self.transform(full_input_path, full_mask_path, mask=False)
+            mask = self.transform(full_input_path, full_mask_path, mask=True)
             input_imgs.append(img)
             mask_imgs.append(mask)
 
@@ -48,14 +48,3 @@ class Dataset:
                                 shuffle=False)
 
         return train_loader, val_loader
-
-
-
-
-
-
-
-
-
-
-

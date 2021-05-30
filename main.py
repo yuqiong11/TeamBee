@@ -24,7 +24,7 @@ num_imgs = 72
 
 # SET DEVICE
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
+print(device)
 # PATH
 mask_path = './imgs/labels/'
 input_path = './imgs/inputs/'
@@ -37,22 +37,22 @@ def main():
     optimizer = optim.SGD(unet.parameters(), lr=lr, momentum=momentum, weight_decay=weight_decay)
 
     # DATA_LOADER
-    data = Dataset(mask_path, input_path)
+    data = Dataset(input_path, mask_path)
     input_imgs, mask_imgs = data.make_tensor(num_imgs)
     train_loader, val_loader = data.data_loader(input_imgs, mask_imgs, batch_size, train_size, val_size)
 
     # LOAD TRAINED MODEL
     if load_model:
-        unet.load_state_dict(torch.load(PATH='./checkpoint'))
+        unet.load_state_dict(torch.load('./checkpoint/state_dict_model.pt'))
 
     outputs = []
 
     for epoch in range(epochs):
         # TRAINING
         train(unet, epoch, optimizer, criterion, train_loader, epochs, device)
-
+        
         # SAVE CHECKPOINT
-        torch.save(unet.state_dict(), PATH='./checkpoint')
+        torch.save(unet.state_dict(), './checkpoint/state_dict_model.pt')
 
         # VALIDATION
         outputs = validate(unet, num_class, val_loader, val_size, batch_size, device, outputs)
