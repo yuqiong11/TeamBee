@@ -25,6 +25,7 @@ def save_img(outputs_list):
     for i in range(len(outputs_list)):
         outputs = outputs_list[i]
         outputs_c = [color_map[i] for i in outputs.cpu()]
+        print("outputs_c:",outputs_c)
         for j in range(len(outputs_c)):
             output = outputs_c[j]
             utils.save_image(output, './outputs/output'+str(i)+str(j)+'.png')

@@ -1,0 +1,55 @@
+from model import UNet
+from data import Dataset
+from train import train
+from validate import validate
+from save import save_img
+
+import torch
+from torch import nn, utils
+import torch.optim as optim
+from torchvision import utils
+
+
+# HYPER-PARAMETERS
+load_model = True
+batch_size = 2
+train_size = 64
+val_size = 8
+epochs = 5
+lr = 0.005
+weight_decay = 0.01
+momentum = 0.9
+num_class = 8
+num_imgs = 72
+
+# SET DEVICE
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print(device)
+# PATH
+mask_path = './imgs/labels/'
+input_path = './imgs/inputs/'
+
+
+def main():
+    # MODEL
+    unet = UNet()
+    #criterion = nn.CrossEntropyLoss()
+    #optimizer = optim.SGD(unet.parameters(), lr=lr, momentum=momentum, weight_decay=weight_decay)
+
+    # DATA_LOADER
+    data = Dataset(input_path, mask_path)
+    input_imgs, mask_imgs = data.make_tensor(num_imgs)
+    train_loader, val_loader = data.data_loader(input_imgs, mask_imgs, batch_size, train_size, val_size)
+
+    # LOAD TRAINED MODEL
+    if load_model:
+        unet.load_state_dict(torch.load('./checkpoint/state_dict_model.pt'))
+
+    outputs = []
+    outputs = validate(unet, num_class, val_loader, val_size, batch_size, device, outputs)
+    print("outputs:",outputs)
+    # SAVE
+    save_img(outputs)
+
+if __name__ == "__main__":
+    main()
