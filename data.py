@@ -2,6 +2,7 @@ import numpy as np
 import torch
 from PIL import Image
 from torch.utils.data import DataLoader, TensorDataset
+from sklearn.model_selection import KFold
 
 class Dataset:
 
@@ -35,16 +36,30 @@ class Dataset:
         mask_imgs = torch.FloatTensor(np.array(mask_imgs))
         return input_imgs, mask_imgs
 
-    def data_loader(self, inputs, masks, batch_size, train_size, val_size):
+    def concat(self, inputs, masks):
         data = TensorDataset(inputs, masks)
+        return data
 
-        train_data, val_data = torch.utils.data.random_split(data, [train_size, val_size])
+    def k_fold(self, data, split_size):
+        kf = KFold(n_splits=split_size, shuffle=True)
+        train_indices = []
+        val_indices = []
 
-        train_loader = DataLoader(dataset=train_data,
+        for train_index, val_index in kf.split(data):
+            train_indices.append(train_index)
+            val_indices.append(val_index)
+
+        return train_indices, val_indices
+
+    def data_loader(self, data, train_index, val_index, batch_size):
+
+        train_loader = DataLoader(dataset=data,
                                   batch_size=batch_size,
+                                  sampler=train_index,
                                   shuffle=True)
-        val_loader = DataLoader(dataset=val_data,
+        val_loader = DataLoader(dataset=data,
                                 batch_size=batch_size,
+                                sampler=val_index,
                                 shuffle=False)
 
         return train_loader, val_loader
