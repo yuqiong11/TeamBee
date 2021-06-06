@@ -24,7 +24,8 @@ def validate(model, num_class, val_loader, val_size, batch_size, device, output_
             # DICE COEFFICIENT
             dice = dice_coefficient(y_pred, targets)
 
-        print('Validation Accuracy: {:.3f} %'.format(acc/(val_size/batch_size)))
+        avg_acc = acc/(val_size/batch_size)
+        print('Validation Accuracy: {:.3f} %'.format(avg_acc))
         print('Validation Dice-Coefficient: {:.3f}'.format(dice))
         print('=' * 40)
 
