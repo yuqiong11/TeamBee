@@ -1,6 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 from torchvision import utils
+import torch
 
 # color_map = {
 #      'Background': (0, 0, 0, 1)
@@ -25,7 +26,10 @@ def save_img(outputs_list):
     for i in range(len(outputs_list)):
         outputs = outputs_list[i]
         outputs_c = [color_map[i] for i in outputs.cpu()]
-        print("outputs_c:",outputs_c)
         for j in range(len(outputs_c)):
-            output = outputs_c[j]
+            output = outputs_c[j]/255
+            print(output)
+            output = torch.from_numpy(output)
+            print(output)
+            print(output.dtype)
             utils.save_image(output, './outputs/output'+str(i)+str(j)+'.png')

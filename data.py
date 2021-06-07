@@ -14,7 +14,7 @@ class Dataset:
             # convert target from RGB to Black-white
             img = np.array(Image.open(full_mask_path).convert("L"), dtype=np.float32)
         else:
-            img = np.array(Image.open(full_input_path).convert("RGB"))
+            img = np.array(Image.open(full_input_path).convert("RGB"), dtype=np.float32)
         return img
 
     def make_tensor(self, num):
