@@ -20,16 +20,16 @@ color_map = np.array(
      [134, 147, 209, 1], [74, 144, 226, 1]]
 )
 
-def color_mapping(outputs_list):
+def save_img(outputs_list):
+
+    # SAVE OUTPUT IMAGES
     for i in range(len(outputs_list)):
         outputs = outputs_list[i]
         outputs_c = [color_map[i] for i in outputs.cpu()]
-    return outputs_c
-
-def save_img(outputs_c):
-
-    # SAVE OUTPUT IMAGES
-    for j in range(len(outputs_c)):
-        output = outputs_c[j] / 255
-        utils.save_image(output, './outputs/output'+str(j)+'.png')
-
+        for j in range(len(outputs_c)):
+            output = outputs_c[j]/255
+            print(output)
+            output = torch.from_numpy(output)
+            print(output)
+            print(output.dtype)
+            utils.save_image(output, './outputs/output'+str(i)+str(j)+'.png')

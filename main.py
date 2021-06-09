@@ -2,33 +2,31 @@ from model import UNet
 from data import Dataset
 from train import train
 from validate import validate
-from save import save_img, color_mapping
-from plot import make_grid
+from save import save_img
 
 import torch
 from torch import nn, utils
 import torch.optim as optim
 from torchvision import utils
 
-
 # HYPER-PARAMETERS
 load_model = False
 batch_size = 2
 train_size = 64
 val_size = 8
-split_size = 9
-epochs = 5
+epochs = 15
 lr = 0.005
 weight_decay = 0.01
 momentum = 0.9
 num_class = 8
-num_imgs = 72
+img_num = 6
+small_img_num = 1200
 
 # SET DEVICE
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(device)
 # PATH
-mask_path = './imgs/labels/'
+mask_path = './imgs/masks/'
 input_path = './imgs/inputs/'
 
 
@@ -38,49 +36,30 @@ def main():
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(unet.parameters(), lr=lr, momentum=momentum, weight_decay=weight_decay)
 
-    # PREPARE DATA
+    # DATA_LOADER
     data = Dataset(input_path, mask_path)
-    input_imgs, mask_imgs = data.make_tensor(num_imgs)
-    data = data.concat(input_imgs, mask_imgs)
-    train_indices, val_indices = data.k_fold(data, split_size)
-
+    input_imgs, mask_imgs = data.make_tensor(img_num, small_img_num)
+    train_loader, val_loader = data.data_loader(input_imgs, mask_imgs, batch_size, train_size, val_size)
 
     # LOAD TRAINED MODEL
     if load_model:
         unet.load_state_dict(torch.load('./checkpoint/state_dict_model.pt'))
 
-    acc_list = []
+    outputs = []
 
-    for i in range(len(train_indices)):
-        train_loader, val_loader = data.data_loader(data, train_indices[i], val_indices[i], batch_size)
+    for epoch in range(epochs):
+        # TRAINING
+        train(unet, epoch, optimizer, criterion, train_loader, epochs, device)
 
-        outputs = []
-        acc_per_kfold = 0
+        # SAVE CHECKPOINT
+        torch.save(unet.state_dict(), './checkpoint/state_dict_model.pt')
 
-        for epoch in range(epochs):
-            # TRAINING
-            train(unet, epoch, optimizer, criterion, train_loader, epochs, device)
-
-            # VALIDATION
-            acc_per_epoch, outputs = validate(unet, num_class, val_loader, val_size, batch_size, device, outputs)
-            acc_per_kfold += acc_per_epoch
-
-        acc_per_kfold /= epochs
-        acc_list.append(acc_per_kfold)
-        print(f'K-fold {i+1} average accuracy: {acc_per_kfold}')
-        print('=' * 40)
-
-    overall_acc = sum(acc_list) / len(acc_list)
-
-    # SAVE CHECKPOINT
-    torch.save(unet.state_dict(), './checkpoint/state_dict_model.pt')
-
-    # VISUALIZE RESULTS
-    outputs_c = color_mapping(outputs)
-    make_grid(outputs_c, nrow=9)
+        # VALIDATION
+        outputs = validate(unet, num_class, val_loader, val_size, batch_size, device, outputs)
 
     # SAVE
-    save_img(outputs_c)
+    save_img(outputs)
+
 
 if __name__ == "__main__":
     main()

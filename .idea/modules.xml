@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/TeamBee.iml" filepath="$PROJECT_DIR$/.idea/TeamBee.iml" />
+      <module fileurl="file://$USER_HOME$/PycharmProjects/TeamBeeTest/.idea/TeamBeeTest.iml" filepath="$USER_HOME$/PycharmProjects/TeamBeeTest/.idea/TeamBeeTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../AI/search/search/.idea/search.iml" filepath="$PROJECT_DIR$/../../AI/search/search/.idea/search.iml" />
     </modules>
   </component>
 </project>
