@@ -15,9 +15,9 @@ import torch
 # }
 
 color_map = np.array(
-    [[0, 0, 0, 1], [189, 16, 224, 1], [80, 227, 194, 1],
-     [208, 2, 27, 1], [248, 231, 28, 1], [126, 211, 33, 1],
-     [134, 147, 209, 1], [74, 144, 226, 1]]
+    [[0, 0, 0], [189, 16, 224], [80, 227, 194],
+     [208, 2, 27], [248, 231, 28], [126, 211, 33],
+     [134, 147, 209], [74, 144, 226]]
 )
 
 def save_img(outputs_list):
@@ -30,6 +30,7 @@ def save_img(outputs_list):
             output = outputs_c[j]/255
             print(output)
             output = torch.from_numpy(output)
+            output = output.permute(2,0,1)
             print(output)
             print(output.dtype)
             utils.save_image(output, './outputs/output'+str(i)+str(j)+'.png')
